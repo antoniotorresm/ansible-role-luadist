@@ -2,19 +2,18 @@
 ---
 
 # Lua packages to install. These packages must be present
-# in the LuaDist repository (https://github.com/LuaDist/Repository)
+# in the repository specified in the `dists_repo` var
 packages: []
 
 # Where to create the Lua virtual environment. All Lua related packages
-# will be installed in this directory.
+# will be installed in this directory. This must be an absolute path.
 env_directory: "/opt"
 
-# Whether to allow using Lua binary dists.
-use_binary_dists: yes
-
-# Whether to allow using Lua source dists. This will allow LuaDist to install
-# packages that need to be built from source.
-use_source_dists: yes
+# Dists types allowed. Possible values are:
+# - source: Only allow dists built from source
+# - binary: Only allow binary dists.
+# - all: Allow both source and binary dists
+allow_dists: "all"
 
 # Repo to install dists from.
 dists_repo: "git://github.com/LuaDist/Repository.git"
