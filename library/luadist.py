@@ -131,14 +131,20 @@ def _luadist_is_present(path):
 
 def _setup_luadist(module, path):
     '''Creates luadist environment in the specified path'''
-    cmd = 'echo "$(curl -fksSL https://tinyurl.com/luadist)" | bash'
+    cmd = 'curl -fksSL https://tinyurl.com/luadist | bash'
     module.run_command(cmd, cwd=path)
+    if not _luadist_is_present(path):
+        module.fail_json(msg =
+            'Cannot create LuaDist environment in the specified path.')
 
 
 def _is_present(module, path, pkgname):
     '''Returns whether package is installed'''
     cmd = "./LuaDist/bin/luadist list " + pkgname
-    _, out, _ = module.run_command(cmd, cwd=path)
+    ret_code, out, _ = module.run_command(cmd, cwd=path)
+    if ret_code == 1:
+        module.fail_json(msg =
+            'Cannot check the status of one or more packages.')
     return pkgname in out
 
 
@@ -162,9 +168,9 @@ def _install_packages(module, path, packages, allowed_dists, repo):
     # Add repository to command
     cmd += ' --repo="' + repo + '"'
 
-    _, out, _ = module.run_command(cmd, cwd=path)
+    ret_code, _, _ = module.run_command(cmd, cwd=path)
 
-    if not "Installation succesful" in out:
+    if ret_code == 1:
         module.fail_json(msg =
             'Cannot install one or more of the specified packages, ' +
             'make sure all packages exist in the configured repository.')
