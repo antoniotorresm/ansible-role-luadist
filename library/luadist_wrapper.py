@@ -8,7 +8,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: luadist
+module: luadist_wrapper
 
 short_description: Manage Lua environment and packages via LuaDist
 
@@ -24,7 +24,7 @@ options:
         description: The path to install the Lua environment to.
         required: true
         type: str
-    package:
+    name:
         description: Name of a Lua package to install.
         type: list
         elements: str
@@ -44,23 +44,24 @@ author:
 
 EXAMPLES = r'''
 - name: Create Lua environment
-  luadist:
+  luadist_wrapper:
     path: /home/myuser/lua
 
 - name: Create Lua environment with additional packages
-  luadist:
+  luadist_wrapper:
     path: /home/myuser/lua
-    package:
+    name:
       - luacurl
       - luagl
       - md5
 
 - name: Create Lua environment with custom repo and only using binary dists
-  luadist:
+  luadist_wrapper
+  :
     path: /home/myuser/lua
     allow_dists: binary
     dists_repo: "git://example.org/myluarepo.git"
-    package:
+    name:
       - luacurl
       - luagl
       - md5
@@ -77,7 +78,7 @@ def run_module():
     # define available arguments/parameters a user can pass to the module
     module_args = dict(
         path=dict(type='str', required=True),
-        package=dict(type='list', elements='str'),
+        name=dict(type='list', elements='str'),
         allow_dists=dict(type='str', default='all',
             choices=["all", "binary", "source"]),
         dists_repo=dict(type='str', default="git://github.com/LuaDist/Repository.git")
@@ -93,7 +94,7 @@ def run_module():
     )
 
     path = module_args["path"]
-    packages = module_args["package"]
+    packages = module_args["name"]
     allow_dists = module_args["allow_dists"]
     dists_repo = module_args["dists_repo"]
 
