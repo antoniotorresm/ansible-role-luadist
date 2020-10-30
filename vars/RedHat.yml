@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: MIT
+---
+system_dependencies:
+  - make
+  - gcc
+  - gcc-c++
+  - kernel-devel
+  - cmake
+  - git
