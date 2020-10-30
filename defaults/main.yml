@@ -1,8 +1,20 @@
 # SPDX-License-Identifier: MIT
 ---
-# Here is the right place to put the role's input variables.
-# This file also serves as a documentation for such a variables.
 
-# Examples of role input variables:
-template_foo: "foo"
-template_bar: "bar"
+# Lua packages to install. These packages must be present
+# in the LuaDist repository (https://github.com/LuaDist/Repository)
+packages: []
+
+# Where to create the Lua virtual environment. All Lua related packages
+# will be installed in this directory.
+env_directory: "/opt"
+
+# Whether to allow using Lua binary dists.
+use_binary_dists: yes
+
+# Whether to allow using Lua source dists. This will allow LuaDist to install
+# packages that need to be built from source.
+use_source_dists: yes
+
+# Repo to install dists from.
+dists_repo: "git://github.com/LuaDist/Repository.git"
