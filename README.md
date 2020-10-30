@@ -1,6 +1,6 @@
 # luadist_test
 
-This role provides support for handling Lua environments and packages via LuaDist (test).
+This role provides support for handling Lua environments and packages via LuaDist. Intended as a programming exercise.
 
 ## Role Variables
 
@@ -20,7 +20,7 @@ Type of dists to allow when installing packages. Values can be:
 * `binary`: Only dists that are distributed as binaries are allowed.
 
 #### `dists_repo`
-Directory to use as package repository. Must follow (LuaDist guidelines)[https://github.com/LuaDist/Repository/wiki/LuaDist:-Configuration#repositories]
+Directory to use as package repository. Must follow [LuaDist guidelines](https://github.com/LuaDist/Repository/wiki/LuaDist:-Configuration#repositories).
 
 ## Dependencies
 
