@@ -3,10 +3,14 @@
 - name: Set platform specific variables
   include_vars: "{{ ansible_os_family }}.yml"
 
-- name: Ensure required packages are installed
+- name: Ensure required system dependencies are installed
   package:
     name: "{{ system_dependencies }}"
     state: present
 
-# TODO
-#- name: Ensure LuaDist and Lua packages required are installed
+- name: Ensure LuaDist and Lua packages required are installed
+  luadist_wrapper:
+    path: {{ env_directory }}
+    allow_dists: {{ allow_dists }}
+    dists_repo: {{ dists_repo }}
+    name: {{ packages }}
