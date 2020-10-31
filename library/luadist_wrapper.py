@@ -56,8 +56,7 @@ EXAMPLES = r'''
       - md5
 
 - name: Create Lua environment with custom repo and only using binary dists
-  luadist_wrapper
-  :
+  luadist_wrapper:
     path: /home/myuser/lua
     allow_dists: binary
     dists_repo: "git://example.org/myluarepo.git"
@@ -67,7 +66,23 @@ EXAMPLES = r'''
       - md5
 '''
 
-RETURN = r''' # '''
+RETURN = r'''
+cmd:
+  description: luadist command used by the module
+  returned: success
+  type: str
+  sample: ./LuaDist/bin/luadist install -source=true -binary=true md5 luagl --repo="git://github.com/LuaDist/Repository.git"
+name:
+  description: List of Lua packages present in the environment
+  returned: success
+  type: list
+  sample: ['md5', 'luagl']
+env_path:
+  description: path where the Lua environment is located
+  returned: success
+  type: str
+  sample: /home/luauser/lua
+'''
 
 import os
 
@@ -80,7 +95,7 @@ def run_module():
         path=dict(type='str', required=True),
         name=dict(type='list', elements='str'),
         allow_dists=dict(type='str', default='all',
-            choices=["all", "binary", "source"]),
+                         choices=["all", "binary", "source"]),
         dists_repo=dict(type='str', default="git://github.com/LuaDist/Repository.git")
     )
 
@@ -112,6 +127,7 @@ def run_module():
         _setup_luadist(module, path)
 
     # Ensure desired packages are installed
+    cmd = ""
     all_present = True
     for package in packages:
         if not _is_present(module, path, package):
@@ -119,9 +135,9 @@ def run_module():
             break
     if not all_present:
         state_changed = True
-        _install_packages(module, path, packages, allow_dists, dists_repo)
+        cmd = _install_packages(module, path, packages, allow_dists, dists_repo)
 
-    module.exit_json(changed=state_changed)
+    module.exit_json(changed=state_changed, cmd=cmd, env_path=path, name=packages)
 
 
 def _luadist_is_present(path):
@@ -133,24 +149,30 @@ def _luadist_is_present(path):
 def _setup_luadist(module, path):
     '''Creates luadist environment in the specified path'''
     cmd = 'curl -fksSL https://tinyurl.com/luadist | bash'
-    module.run_command(cmd, cwd=path)
+    ret_code, out, err = module.run_command(cmd, cwd=path)
     if not _luadist_is_present(path):
-        module.fail_json(msg =
-            'Cannot create LuaDist environment in the specified path.')
+        module.fail_json(
+            rc=ret_code,
+            stdout=out,
+            stderr=err,
+            msg='Cannot create LuaDist environment in the specified path.')
 
 
 def _is_present(module, path, pkgname):
     '''Returns whether package is installed'''
     cmd = "./LuaDist/bin/luadist list " + pkgname
-    ret_code, out, _ = module.run_command(cmd, cwd=path)
-    if ret_code == 1:
-        module.fail_json(msg =
-            'Cannot check the status of one or more packages.')
+    ret_code, out, err = module.run_command(cmd, cwd=path)
+    if ret_code != 0:
+        module.fail_json(
+            rc=ret_code,
+            stdout=out,
+            stderr=err,
+            msg='Cannot check the status of one or more packages.')
     return pkgname in out
 
 
 def _install_packages(module, path, packages, allowed_dists, repo):
-    '''Installs the specified packages'''
+    '''Installs the specified packages. Returns the command used for installation'''
     cmd = "./LuaDist/bin/luadist install "
 
     # Add packages to command
@@ -169,12 +191,17 @@ def _install_packages(module, path, packages, allowed_dists, repo):
     # Add repository to command
     cmd += ' --repo="' + repo + '"'
 
-    ret_code, _, _ = module.run_command(cmd, cwd=path)
+    ret_code, out, err = module.run_command(cmd, cwd=path)
 
-    if ret_code == 1:
-        module.fail_json(msg =
-            'Cannot install one or more of the specified packages, ' +
+    if ret_code != 0:
+        module.fail_json(
+            rc=ret_code,
+            stdout=out,
+            stderr=err,
+            msg='Cannot install one or more of the specified packages, ' +
             'make sure all packages exist in the configured repository.')
+
+    return cmd
 
 
 def main():
