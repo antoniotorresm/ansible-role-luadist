@@ -8,9 +8,9 @@
     name: "{{ system_dependencies }}"
     state: present
 
-- name: Ensure LuaDist and Lua packages required are installed
+- name: Ensure LuaDist and required Lua packages are installed
   luadist_wrapper:
-    path: {{ env_directory }}
-    allow_dists: {{ allow_dists }}
-    dists_repo: {{ dists_repo }}
-    name: {{ packages }}
+    path: "{{ env_directory }}"
+    allow_dists: "{{ allow_dists }}"
+    dists_repo: "{{ dists_repo }}"
+    name: "{{ packages }}"
