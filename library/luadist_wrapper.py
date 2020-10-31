@@ -99,25 +99,14 @@ def run_module():
         dists_repo=dict(type='str', default="git://github.com/LuaDist/Repository.git")
     )
 
-    # the AnsibleModule object will be our abstraction working with Ansible
-    # this includes instantiation, a couple of common attr would be the
-    # args/params passed to the execution, as well as if the module
-    # supports check mode
     module = AnsibleModule(
-        argument_spec=module_args,
-        supports_check_mode=True
+        argument_spec=module_args
     )
 
     path = module_args["path"]
     packages = module_args["name"]
     allow_dists = module_args["allow_dists"]
     dists_repo = module_args["dists_repo"]
-
-    # if the user is working with this module in only check mode we do not
-    # want to make any changes to the environment, just return the current
-    # state with no modifications
-    if module.check_mode:
-        module.exit_json(changed=False)
 
     state_changed = False
 
@@ -192,8 +181,9 @@ def _install_packages(module, path, packages, allowed_dists, repo):
     cmd += ' --repo="' + repo + '"'
 
     ret_code, out, err = module.run_command(cmd, cwd=path)
+    already_installed = "No packages to install" in out
 
-    if ret_code != 0:
+    if ret_code != 0 and not already_installed:
         module.fail_json(
             rc=ret_code,
             stdout=out,
