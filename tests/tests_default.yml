@@ -2,6 +2,19 @@
 ---
 - name: Ensure that the role runs with default parameters
   hosts: all
-
   roles:
     - antoniotorresm.luadist_test
+
+- name: Ensure that the role is idempotent
+  hosts: all
+  roles:
+    - antoniotorresm.luadist_test
+
+- name: Ensure that the role can correctly install Lua packages
+  hosts: all
+  roles:
+    - antoniotorresm.luadist_test
+  vars:
+    packages:
+      - md5
+    dists_repo: "git://github.com/LuaDist/Repository.git"
