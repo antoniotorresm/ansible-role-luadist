@@ -3,10 +3,11 @@
 
 # Copyright: (c) 2020, Antonio Torres <atorresm@protonmail.com>
 # GNU General Public License v3.0
-from __future__ import (absolute_import, division, print_function)
+from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 ---
 module: luadist_wrapper
 
@@ -14,8 +15,8 @@ short_description: Manage Lua environment and packages via LuaDist
 
 version_added: "2.10"
 
-description: 
-    - Manage Lua environment and packages via LuaDist. The user can 
+description:
+    - Manage Lua environment and packages via LuaDist. The user can
       define a list of packages to install and the directory to install
       the Lua development environment and required packages.
 
@@ -40,9 +41,9 @@ options:
 
 author:
     - Antonio Torres (@antoniotorresm)
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Create Lua environment
   luadist_wrapper:
     path: /home/myuser/lua
@@ -64,9 +65,9 @@ EXAMPLES = r'''
       - luacurl
       - luagl
       - md5
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 cmd:
   description: luadist command used by the module
   returned: success
@@ -82,7 +83,7 @@ env_path:
   returned: success
   type: str
   sample: /home/luauser/lua
-'''
+"""
 
 import os
 
@@ -92,16 +93,15 @@ from ansible.module_utils.basic import AnsibleModule
 def run_module():
     # define available arguments/parameters a user can pass to the module
     module_args = dict(
-        path=dict(type='str', required=True),
-        name=dict(type='list', elements='str'),
-        allow_dists=dict(type='str', default='all',
-                         choices=["all", "binary", "source"]),
-        dists_repo=dict(type='str', default="git://github.com/LuaDist/Repository.git")
+        path=dict(type="str", required=True),
+        name=dict(type="list", elements="str"),
+        allow_dists=dict(
+            type="str", default="all", choices=["all", "binary", "source"]
+        ),
+        dists_repo=dict(type="str", default="git://github.com/LuaDist/Repository.git"),
     )
 
-    module = AnsibleModule(
-        argument_spec=module_args
-    )
+    module = AnsibleModule(argument_spec=module_args)
 
     path = module_args["path"]
     packages = module_args["name"]
@@ -130,25 +130,26 @@ def run_module():
 
 
 def _luadist_is_present(path):
-    '''Returns whether luadist environment is in the specified path'''
+    """Returns whether luadist environment is in the specified path"""
     os.chdir(path)
     return os.path.exists("LuaDist/bin/luadist")
 
 
 def _setup_luadist(module, path):
-    '''Creates luadist environment in the specified path'''
-    cmd = 'curl -fksSL https://tinyurl.com/luadist | bash'
+    """Creates luadist environment in the specified path"""
+    cmd = "curl -fksSL https://tinyurl.com/luadist | bash"
     ret_code, out, err = module.run_command(cmd, cwd=path)
     if not _luadist_is_present(path):
         module.fail_json(
             rc=ret_code,
             stdout=out,
             stderr=err,
-            msg='Cannot create LuaDist environment in the specified path.')
+            msg="Cannot create LuaDist environment in the specified path.",
+        )
 
 
 def _is_present(module, path, pkgname):
-    '''Returns whether package is installed'''
+    """Returns whether package is installed"""
     cmd = "./LuaDist/bin/luadist list " + pkgname
     ret_code, out, err = module.run_command(cmd, cwd=path)
     if ret_code != 0:
@@ -156,12 +157,13 @@ def _is_present(module, path, pkgname):
             rc=ret_code,
             stdout=out,
             stderr=err,
-            msg='Cannot check the status of one or more packages.')
+            msg="Cannot check the status of one or more packages.",
+        )
     return pkgname in out
 
 
 def _install_packages(module, path, packages, allowed_dists, repo):
-    '''Installs the specified packages. Returns the command used for installation'''
+    """Installs the specified packages. Returns the command used for installation"""
     cmd = "./LuaDist/bin/luadist install "
 
     # Add packages to command
@@ -188,8 +190,9 @@ def _install_packages(module, path, packages, allowed_dists, repo):
             rc=ret_code,
             stdout=out,
             stderr=err,
-            msg='Cannot install one or more of the specified packages, ' +
-            'make sure all packages exist in the configured repository.')
+            msg="Cannot install one or more of the specified packages, "
+            + "make sure all packages exist in the configured repository.",
+        )
 
     return cmd
 
@@ -198,5 +201,5 @@ def main():
     run_module()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

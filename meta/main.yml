@@ -3,7 +3,7 @@
 galaxy_info:
   role_name: luadist_test
   author: Antonio Torres <atorresm@protonmail.com>
-  description: Role for handling Lua environment and packages via LuaDist (test).
+  description: Role for handling Lua environment and packages via LuaDist (test)
 
   license: MIT
 
