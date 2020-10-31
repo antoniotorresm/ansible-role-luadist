@@ -72,7 +72,7 @@ cmd:
   description: luadist command used by the module
   returned: success
   type: str
-  sample: ./LuaDist/bin/luadist install -source=true -binary=true md5 luagl --repo="git://github.com/LuaDist/Repository.git"
+  sample: ./LuaDist/bin/luadist install -source=true -binary=true md5 luagl -repos="git://github.com/LuaDist/Repository.git"
 name:
   description: List of Lua packages present in the environment
   returned: success
@@ -103,42 +103,43 @@ def run_module():
 
     module = AnsibleModule(argument_spec=module_args)
 
-    path = module_args["path"]
-    packages = module_args["name"]
-    allow_dists = module_args["allow_dists"]
-    dists_repo = module_args["dists_repo"]
+    path = module.params["path"]
+    packages = module.params["name"]
+    allow_dists = module.params["allow_dists"]
+    dists_repo = module.params["dists_repo"]
 
-    state_changed = False
+    # define module result
+    result = dict(changed=False, cmd="", env_path=path, name=packages)
 
     # Setup the Lua environment in the desired path
     if not _luadist_is_present(path):
-        state_changed = True
+        result["changed"] = True
         _setup_luadist(module, path)
 
     # Ensure desired packages are installed
-    cmd = ""
     all_present = True
     for package in packages:
         if not _is_present(module, path, package):
             all_present = False
             break
     if not all_present:
-        state_changed = True
-        cmd = _install_packages(module, path, packages, allow_dists, dists_repo)
+        result["changed"] = True
+        result["cmd"] = _install_packages(
+            module, path, packages, allow_dists, dists_repo
+        )
 
-    module.exit_json(changed=state_changed, cmd=cmd, env_path=path, name=packages)
+    module.exit_json(**result)
 
 
 def _luadist_is_present(path):
     """Returns whether luadist environment is in the specified path"""
-    os.chdir(path)
-    return os.path.exists("LuaDist/bin/luadist")
+    return os.path.exists(os.path.join(path, "LuaDist/bin/luadist"))
 
 
 def _setup_luadist(module, path):
     """Creates luadist environment in the specified path"""
     cmd = "curl -fksSL https://tinyurl.com/luadist | bash"
-    ret_code, out, err = module.run_command(cmd, cwd=path)
+    ret_code, out, err = module.run_command(cmd, cwd=path, use_unsafe_shell=True)
     if not _luadist_is_present(path):
         module.fail_json(
             rc=ret_code,
@@ -180,7 +181,7 @@ def _install_packages(module, path, packages, allowed_dists, repo):
     cmd += " -source=" + source_allowed + " -binary=" + binary_allowed
 
     # Add repository to command
-    cmd += ' --repo="' + repo + '"'
+    cmd += ' -repos="' + repo + '"'
 
     ret_code, out, err = module.run_command(cmd, cwd=path)
     already_installed = "No packages to install" in out
