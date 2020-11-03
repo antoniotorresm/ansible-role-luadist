@@ -39,7 +39,7 @@ None
         allow_dists: "all"
         packages:
           - md5
-          - luagl
+          - lanes
     - name: Demonstrate role is idempotent
       import_role:
         name: luadist_test
@@ -48,7 +48,7 @@ None
         allow_dists: "all"
         packages:
           - md5
-          - luagl
+          - lanes
 ```
 
 ## License

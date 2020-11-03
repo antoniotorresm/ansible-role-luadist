@@ -52,8 +52,8 @@ EXAMPLES = r"""
   luadist_wrapper:
     path: /home/myuser/lua
     name:
-      - luacurl
-      - luagl
+      - busted
+      - lanes
       - md5
 
 - name: Create Lua environment with custom repo and only using binary dists
@@ -62,8 +62,8 @@ EXAMPLES = r"""
     allow_dists: binary
     dists_repo: "git://example.org/myluarepo.git"
     name:
-      - luacurl
-      - luagl
+      - busted
+      - lanes
       - md5
 """
 
@@ -72,12 +72,12 @@ cmd:
   description: luadist command used by the module
   returned: success
   type: str
-  sample: ./LuaDist/bin/luadist install -source=true -binary=true md5 luagl -repos="git://github.com/LuaDist/Repository.git"
+  sample: ./LuaDist/bin/luadist install -source=true -binary=true md5 lanes -repos="git://github.com/LuaDist/Repository.git"
 name:
   description: List of Lua packages present in the environment
   returned: success
   type: list
-  sample: ['md5', 'luagl']
+  sample: ['md5', 'lanes']
 env_path:
   description: path where the Lua environment is located
   returned: success

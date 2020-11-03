@@ -17,4 +17,7 @@
   vars:
     packages:
       - md5
+      - busted
+      - lanes
+      - freetype
     dists_repo: "git://github.com/LuaDist/Repository.git"
