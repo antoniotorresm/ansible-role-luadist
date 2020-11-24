@@ -3,17 +3,17 @@
 - name: Ensure that the role runs with default parameters
   hosts: all
   roles:
-    - antoniotorresm.luadist_test
+    - antoniotorresm.luadist
 
 - name: Ensure that the role is idempotent
   hosts: all
   roles:
-    - antoniotorresm.luadist_test
+    - antoniotorresm.luadist
 
 - name: Ensure that the role can correctly install Lua packages
   hosts: all
   roles:
-    - antoniotorresm.luadist_test
+    - antoniotorresm.luadist
   vars:
     packages:
       - md5

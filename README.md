@@ -1,6 +1,9 @@
-# luadist_test
+# luadist Ansible role
 
-This role provides support for handling Lua environments and packages via LuaDist. Intended as a programming exercise.
+This role provides support for handling Lua environments and packages via LuaDist. Includes an
+Ansible module for installing and running LuaDist commands.
+
+**Note**: LuaDist is no longer maintained. Consider using [LuaRocks](https://luarocks.org/) instead.
 
 ## Role Variables
 
@@ -33,16 +36,7 @@ None
   tasks:
     - name: Install Lua environment with packages
       import_role:
-        name: luadist_test
-      vars:
-        env_directory: "/opt"
-        allow_dists: "all"
-        packages:
-          - md5
-          - lanes
-    - name: Demonstrate role is idempotent
-      import_role:
-        name: luadist_test
+        name: luadist
       vars:
         env_directory: "/opt"
         allow_dists: "all"
